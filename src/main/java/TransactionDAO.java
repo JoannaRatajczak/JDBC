@@ -31,7 +31,7 @@ public class TransactionDAO {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, type);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
+            while (resultSet.next()) {
                 long id = resultSet.getLong(1);
                 String typ = resultSet.getString(2);
                 String desc = resultSet.getString(3);
