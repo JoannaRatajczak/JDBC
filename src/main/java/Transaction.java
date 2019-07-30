@@ -24,10 +24,10 @@ public class Transaction {
     public String toString() {
         return "Transaction: " +
                 "id=" + id +
-                ", type='" + type +
-                ", description='" + description +
+                ", type=" + type +
+                ", description=" + description +
                 ", amount=" + amount +
-                ", date='" + date;
+                ", date=" + date;
     }
 
     public long getId() {

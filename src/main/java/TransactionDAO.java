@@ -21,49 +21,29 @@ public class TransactionDAO {
         return null;
     }
 
-
-    /*private static final String URL = "jdbc:mysql://localhost:3306/budget?characterEncoding=utf8&serverTimezone=UTC";
-    private static final String USER = "root";
-    private static final String PASS = "root";
-    private Connection connection;
-
-    private Connection connect() {
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(URL, USER, PASS);
-        } catch (ClassNotFoundException e) {
-            System.err.println("No driver found");
-        } catch (SQLException e) {
-            System.err.println("Could not establish connection");
-        }
-        close(connection);
-        return null;
-    }*/
-
     public List list(String type) {
         Connection connection = connect();
+        PreparedStatement preparedStatement = null;
 
         String sql = "SELECT id, type, description, amount, date FROM transaction where type = ?";
-        List list = new ArrayList();
+        List<Transaction> list = new ArrayList<Transaction>();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, type);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                Transaction transaction = new Transaction();
-                transaction.setId(resultSet.getInt("id"));
-                transaction.setType(resultSet.getString("type"));
-                transaction.setDescription(resultSet.getString("description"));
-                transaction.setAmount(resultSet.getDouble("amount"));
-                transaction.setDate(resultSet.getString("date"));
-                list.add(transaction);
+                long id = resultSet.getLong(1);
+                String typ = resultSet.getString(2);
+                String desc = resultSet.getString(3);
+                double amount = resultSet.getDouble(4);
+                String date = resultSet.getString(5);
+                list.add(new Transaction(id, typ, desc, amount, date));
             }
             return list;
         } catch (SQLException e) {
             System.out.println("Could not get transaction");
         }
-        close(connection);
+        //close(connection);
         return null;
     }
 
@@ -72,7 +52,8 @@ public class TransactionDAO {
 
         PreparedStatement preparedStatement = null;
         try {
-            String sql = "NSERT INTO transaction (type, description, amount, date) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO transaction (type, description, amount, date) VALUES (?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, transaction.getType());
             preparedStatement.setString(2, transaction.getDescription());
             preparedStatement.setDouble(3, transaction.getAmount());
@@ -83,7 +64,7 @@ public class TransactionDAO {
             System.out.println("Could not save record");
             e.printStackTrace();
         }
-        close(connection);
+        //close(connection);
 
     }
 
@@ -92,18 +73,19 @@ public class TransactionDAO {
 
         PreparedStatement preparedStatement = null;
         try {
-            String sql = "UPDATE transaction SET type = ?, description= ?, amount= ?, date WHERE id = ?";
+            String sql = "UPDATE transaction SET type = ?, description= ?, amount= ?, date= ? WHERE id = ?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, transaction.getType());
             preparedStatement.setString(2, transaction.getDescription());
             preparedStatement.setDouble(3, transaction.getAmount());
             preparedStatement.setString(4, transaction.getDate());
+            preparedStatement.setLong(5, transaction.getId());
             preparedStatement.executeUpdate();
 
         } catch (SQLException e) {
             System.out.println("Could not find transaction");
         }
-        close(connection);
+        //close(connection);
     }
 
     public void deleteByID(long id) {
@@ -120,7 +102,7 @@ public class TransactionDAO {
             System.out.println("Could not remove");
         }
 
-        close(connection);
+        //close(connection);
 
     }
 
